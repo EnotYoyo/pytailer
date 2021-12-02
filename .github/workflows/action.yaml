@@ -1,13 +1,13 @@
 ---
-name: "Tests runner"
-on: [ "push" ]
+name: 'Tests'
+on: [ 'push' ]
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ Ubuntu, Windows, macOS ]
-        python-version: [ "3.6" ] # , "3.7", "3.8", "3.9"]
+        python-version: [ '3.6' ] # , "3.7", "3.8", "3.9"]
         include:
           - os: Ubuntu
             image: ubuntu-latest
@@ -28,11 +28,11 @@ jobs:
           curl -sL https://install.python-poetry.org | python -
 
       - name: Update PATH
-        if: ${{ matrix.os != "Windows" }}
+        if: ${{ matrix.os != 'Windows' }}
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Update PATH for Windows
-        if: ${{ matrix.os == "Windows" }}
+        if: ${{ matrix.os == 'Windows' }}
         run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
       - name: Configure poetry
@@ -43,7 +43,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-${{ matrix.python-version }}-${{ hashFiles("poetry.lock") }}
+          key: venv-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         run: poetry install
