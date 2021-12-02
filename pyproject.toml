@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pytailer"
+version = "0.1.0"
+description = "It is very simple implementation of the unix shell utility `tail`"
+authors = ["Andrey Lemets <a.a.lemets@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/EnotYoyo/pytailer"
+repository = "https://github.com/EnotYoyo/pytailer"
+keywords = ["tail", "tailf"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "6.2.5"
+pytest-mock = "3.6.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
