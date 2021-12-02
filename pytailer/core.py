@@ -64,15 +64,15 @@ class MutableFile:
             return []
 
         current_offset, lines = buffer_length, []
-        self._current_file.seek(0, os.SEEK_END)
+        self.seek(0, os.SEEK_END)
 
         # trying to find the offset to read num lines from file
         while num and len(lines) <= num:
             try:
-                self._current_file.seek(self._current_file.tell() - current_offset)
+                self.seek(self._current_file.tell() - current_offset)
             except (IOError, ValueError):
                 logger.debug("Read all lines from file")
-                self._current_file.seek(0)
+                self.seek(0)
                 break
             finally:
                 lines = self._current_file.readlines()
@@ -91,7 +91,7 @@ class MutableFile:
         if line and line[-1] in self.ends_of_line:
             return line
         else:
-            self._current_file.seek(prev_position)
+            self.seek(prev_position)
             return ""
 
 

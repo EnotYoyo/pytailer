@@ -4,14 +4,11 @@ import pytest
 from pytest_mock import MockerFixture
 
 from pytailer import FileTail
-from utils import write_to_end
+from utils import EndTest, write_to_end
+
+pytestmark = pytest.mark.timeout(1)
 
 
-class EndTest(Exception):
-    ...
-
-
-@pytest.mark.timeout(1)
 def test_tail_lines(tmp_path: Path):
     tmp_file = tmp_path / "file.txt"
     tmp_file.write_text("hello\nworld\n")
@@ -24,7 +21,6 @@ def test_tail_lines(tmp_path: Path):
     assert next(file_tail_iter) == "world\n"
 
 
-@pytest.mark.timeout(1)
 def test_tail_simple(tmp_path: Path):
     tmp_file = tmp_path / "file.txt"
     tmp_file.write_text("hello\n")
@@ -38,7 +34,6 @@ def test_tail_simple(tmp_path: Path):
     assert next(file_tail_iter) == test_line
 
 
-@pytest.mark.timeout(1)
 def test_tail_file_wait_data(tmp_path: Path, mocker: MockerFixture):
     mocker.patch("time.sleep", side_effect=[3, 2, 1, EndTest()])
     tmp_file = tmp_path / "file.txt"
@@ -48,7 +43,6 @@ def test_tail_file_wait_data(tmp_path: Path, mocker: MockerFixture):
         next(file_tail_iter)
 
 
-@pytest.mark.timeout(1)
 def test_tail_file_as_context_manager(tmp_path: Path):
     tmp_file = tmp_path / "file.txt"
     tmp_file.write_text("hello\n")
