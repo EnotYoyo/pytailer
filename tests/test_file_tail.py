@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import AnyStr
 
@@ -144,6 +145,7 @@ def test_mutable_file_readline_without_newline(tmp_path: Path):
     assert mutable_file.readline() == ""
 
 
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="can't unlink an open file")
 def test_mutable_file_continue_read_after_remove(tmp_path: Path):
     tmp_file = tmp_path / "file.txt"
     tmp_file.write_text("hello\nworld\n")
