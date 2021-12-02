@@ -1,1 +1,1 @@
-from core import FileTail, fail_tail
+from .core import FileTail, fail_tail
