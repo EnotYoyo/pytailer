@@ -6,15 +6,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ Ubuntu, Windows, macOS ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         python-version: [ '3.6' ] # , "3.7", "3.8", "3.9"]
-        include:
-          - os: Ubuntu
-            image: ubuntu-latest
-          - os: Windows
-            image: windows-latest
-          - os: macOS
-            image: macos-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -28,11 +21,11 @@ jobs:
           curl -sL https://install.python-poetry.org | python -
 
       - name: Update PATH
-        if: ${{ matrix.os != 'Windows' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Update PATH for Windows
-        if: ${{ matrix.os == 'Windows' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
       - name: Configure poetry
