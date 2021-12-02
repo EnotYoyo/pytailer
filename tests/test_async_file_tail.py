@@ -1,5 +1,7 @@
+import asyncio
+import sys
 from pathlib import Path
-from time import sleep
+from typing import Any
 
 import pytest
 from pytest_mock import MockerFixture
@@ -7,7 +9,7 @@ from pytest_mock import MockerFixture
 from pytailer import AsyncFileTail
 from utils import EndTest, aiter, anext, write_to_end
 
-pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(1)]
+pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(100000)]
 
 
 async def test_async_tail_lines(tmp_path: Path):
@@ -36,9 +38,21 @@ async def test_async_tail_simple(tmp_path: Path):
 
 
 async def test_async_tail_file_wait_data(tmp_path: Path, mocker: MockerFixture):
-    mocker.patch("asyncio.sleep", side_effect=[3, 2, 1, EndTest()])
-    tmp_file = tmp_path / "file.txt"
+    def _awaitable(value: Any):
+        # for python 3.8+ mocker will be use AsyncMock
+        if sys.version_info >= (3, 8):
+            return value
 
+        # simple awaitable wrapper for 3.7- side_effect
+        future = asyncio.Future()
+        if isinstance(value, Exception):
+            future.set_exception(value)
+        else:
+            future.set_result(value)
+        return future
+
+    mocker.patch("asyncio.sleep", side_effect=[_awaitable(3), _awaitable(2), _awaitable(1), _awaitable(EndTest())])
+    tmp_file = tmp_path / "file.txt"
     file_tail_iter = aiter(AsyncFileTail(tmp_file))
     with pytest.raises(EndTest):
         await anext(file_tail_iter)
