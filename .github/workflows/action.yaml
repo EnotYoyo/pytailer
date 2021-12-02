@@ -1,18 +1,52 @@
 ---
 name: "Tests runner"
-on: ["push"]
+on: [ "push" ]
 jobs:
-  build:
+  tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.6', '3.7', '3.8', 'pypy-3.6']
+        os: [ Ubuntu, Windows, macOS ]
+        python-version: [ "3.6" ] # , "3.7", "3.8", "3.9"]
+        include:
+          - os: Ubuntu
+            image: ubuntu-latest
+          - os: Windows
+            image: windows-latest
+          - os: macOS
+            image: macos-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+
+      - name: Install poetry
+        run: |
+          curl -sL https://install.python-poetry.org | python -
+
+      - name: Update PATH
+        if: ${{ matrix.os != "Windows" }}
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Update PATH for Windows
+        if: ${{ matrix.os == "Windows" }}
+        run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+
+      - name: Configure poetry
+        run: poetry config virtualenvs.in-project true
+
+      - name: Set up cache
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: .venv
+          key: venv-${{ matrix.python-version }}-${{ hashFiles("poetry.lock") }}
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run pytest
+        run: poetry run python -m pytest -p no:sugar -q tests/
